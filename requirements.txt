@@ -2,6 +2,7 @@ Django>=4.2
 dj-database-url
 pandas
 matplotlib
+gunicorn
 whitenoise
 python-dotenv
 textract
