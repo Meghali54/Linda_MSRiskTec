@@ -1,12 +1,17 @@
 Django>=4.2
 dj-database-url
 pandas
+numpy
 matplotlib
 gunicorn
 whitenoise
 python-dotenv
-textract
 openpyxl
 psycopg2-binary
-google-genai   # or the Google Gen AI / Gemini client library you choose
-dj-database-url
+google-genai
+pdfminer.six
+PyPDF2
+ydata-profiling[notebook]
+pillow
+imagehash
+visions
