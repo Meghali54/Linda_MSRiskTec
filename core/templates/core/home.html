@@ -1,0 +1,157 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Smart Office Assistant{% endblock %}
+{% block content %}
+
+<style>
+.home-header {
+    text-align: center;
+    margin-bottom: 30px;
+    animation: fadeIn 0.6s ease;
+}
+
+.home-title {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.home-subtitle {
+    color: #cbd5e1;
+    margin-top: 6px;
+    font-size: 16px;
+}
+
+.card-files {
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 18px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.25);
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity:0; transform: translateY(18px); }
+    to { opacity:1; transform: translateY(0); }
+}
+
+.upload-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 12px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+.upload-btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+}
+
+/* Table styling consistent with file_detail */
+.eda-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.eda-table th {
+    background: rgba(255,255,255,0.15);
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.eda-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.eda-table tr:nth-child(even) {
+    background: rgba(255,255,255,0.05);
+}
+
+.link-file {
+    color:#7dd3fc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-file:hover {
+    text-decoration: underline;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+    from {opacity:0}
+    to {opacity:1}
+}
+</style>
+
+<div class="home-header">
+    <h1 class="home-title">Smart Office Assistant</h1>
+    <p class="home-subtitle">Manage your datasets, generate insights, and interact with AI.</p>
+</div>
+
+<div class="card card-files">
+
+{% if user.is_authenticated %}
+
+    <h3 style="margin-bottom:15px;">📂 Your Uploaded Files</h3>
+
+    {% if files %}
+        <table class="eda-table">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Uploaded At</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for f in files %}
+                <tr>
+                    <td>
+                        <a class="link-file" href="{% url 'core:file_detail' f.pk %}">
+                            📄 {{ f.filename }}
+                        </a>
+                    </td>
+                    <td>{{ f.uploaded_at }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="margin-top:14px; font-size:15px;">No uploads yet.</p>
+
+        <a href="{% url 'core:upload' %}">
+            <button class="upload-btn">📤 Upload a File</button>
+        </a>
+    {% endif %}
+
+{% else %}
+
+    <p style="font-size:16px; margin-bottom:15px;">
+        Welcome! Please 
+        <a href="{% url 'core:login' %}" style="color:#38bdf8;">login</a> 
+        or 
+        <a href="{% url 'core:register' %}" style="color:#38bdf8;">register</a>
+        to get started.
+    </p>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

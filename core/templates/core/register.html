@@ -1,0 +1,45 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="card" style="max-width: 450px; margin: 50px auto; text-align:center; animation: fadeIn 0.4s;">
+    <h2 class="glow-text" style="margin-bottom:20px;">Create Account</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-fields">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+
+    <p style="margin-top:15px;">Already have an account?
+        <a href="{% url 'core:login' %}" style="color:#38bdf8;">Login</a>
+    </p>
+</div>
+
+<style>
+.submit-btn {
+    width:100%;
+    padding:12px 16px;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.submit-btn:hover {
+    opacity:0.9;
+    transform: translateY(-2px);
+}
+
+.form-fields p {
+    text-align:left;
+}
+</style>
+
+{% endblock %}

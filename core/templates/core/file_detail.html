@@ -1,0 +1,407 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load extra_filters %}
+{% block content %}
+
+<style>
+
+/* -------------------------------------------------------
+   PAGE LAYOUT
+------------------------------------------------------- */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity:0; transform: translateY(10px); }
+    to   { opacity:1; transform: translateY(0); }
+}
+
+/* -------------------------------------------------------
+   PAGE TITLE
+------------------------------------------------------- */
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+}
+
+.page-subtitle {
+    color: #94a3b8;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+/* -------------------------------------------------------
+   TABS
+------------------------------------------------------- */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.tab-btn {
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #e2e8f0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.tab-btn:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    border: none;
+    color: white;
+}
+
+/* -------------------------------------------------------
+   CARDS (GLASS)
+------------------------------------------------------- */
+.card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(18px);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.10);
+    margin-bottom: 25px;
+}
+
+/* -------------------------------------------------------
+   CHAT
+------------------------------------------------------- */
+.chat-box {
+    border-radius: 14px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    height: 450px;
+    overflow-y: auto;
+    backdrop-filter: blur(12px);
+}
+
+.bubble {
+    padding: 12px 18px;
+    border-radius: 16px;
+    margin: 12px 0;
+    max-width: 78%;
+    font-size: 15px;
+    animation: fadeIn 0.35s ease;
+    line-height: 1.6;
+}
+
+.bubble.user {
+    margin-left: auto;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: white;
+}
+
+.bubble.ai {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #e2e8f0;
+}
+
+/* -------------------------------------------------------
+   TABLES FOR EDA
+------------------------------------------------------- */
+.eda-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.eda-table th {
+    background: rgba(255,255,255,0.18);
+    padding: 10px;
+    text-align: left;
+}
+
+.eda-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.eda-table tr:nth-child(even) {
+    background: rgba(255,255,255,0.06);
+}
+
+.scroll-x {
+    overflow-x: auto;
+}
+
+/* -------------------------------------------------------
+   IFRAMES
+------------------------------------------------------- */
+.report-frame {
+    width: 100%;
+    height: 750px;
+    border-radius: 12px;
+    border: none;
+}
+
+/* HIDE TABS LOGIC */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Section title */
+.section-title {
+    margin-top: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    color:#e2e8f0;
+}
+
+</style>
+
+
+
+<div class="dashboard-container">
+
+    <h1 class="page-title">{{ file.filename }}</h1>
+    <p class="page-subtitle">Uploaded at: {{ file.uploaded_at }}</p>
+
+    <!-- ---------------- TABS ---------------- -->
+    <div class="tabs">
+        <div class="tab-btn active" data-tab="summary-tab">Summary</div>
+        <div class="tab-btn" data-tab="report-tab">EDA Report</div>
+        <div class="tab-btn" data-tab="chat-tab">AI Chat</div>
+    </div>
+
+    <!-- ---------------- SUMMARY TAB ---------------- -->
+    <div class="tab-content active" id="summary-tab">
+
+        <!-- BASIC EDA CARD -->
+        <div class="card">
+            <h2 class="glow-text">📊 Basic EDA</h2>
+
+            <!-- Column Data Types -->
+            <h4 class="section-title">🔹 Column Data Types</h4>
+            <table class="eda-table">
+                <thead>
+                    <tr><th>Column</th><th>Data Type</th></tr>
+                </thead>
+                <tbody>
+                {% for col, dtype in eda.basic_eda.dtypes.items %}
+                    <tr>
+                        <td>{{ col }}</td>
+                        <td>{{ dtype }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Missing Values -->
+            <h4 class="section-title">🔹 Missing Values</h4>
+            <table class="eda-table">
+                <thead><tr><th>Column</th><th>Missing</th></tr></thead>
+                <tbody>
+                {% for col, val in eda.basic_eda.missing.items %}
+                    <tr>
+                        <td>{{ col }}</td>
+                        <td>{{ val }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Describe Stats -->
+            <h4 class="section-title">🔹 Describe Statistics</h4>
+            <div class="scroll-x">
+            <table class="eda-table wide">
+                <thead>
+                <tr>
+                    <th>Column</th>
+                    {% for stat in eda.basic_eda.describe_headers %}
+                        <th>{{ stat }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for col, stats in eda.basic_eda.describe.items %}
+                    <tr>
+                        <td><strong>{{ col }}</strong></td>
+                        {% for stat_name in eda.basic_eda.describe_headers %}
+                            <td>{{ stats|get_item:stat_name }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+
+        </div>
+
+
+        <!-- DATASET SUMMARY CARD -->
+        <div class="card">
+            <h2 class="glow-text">📄 Dataset Summary</h2>
+
+            <!-- <p><strong>Shape:</strong> {{ eda.shape }}</p>
+            <p><strong>Columns:</strong> {{ eda.columns }}</p>
+
+            <h4 class="section-title">Preview (Top 5 Rows)</h4>
+            <pre style="background:rgba(255,255,255,0.1); padding:16px; border-radius:12px; overflow:auto;">
+{{ eda.head | safe }}
+            </pre> -->
+
+            <h4 class="section-title">📈 Charts</h4>
+            {% if charts %}
+                {% for c in charts %}
+                    <img src="{{ c }}" style="max-width:280px; margin:10px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.4);"/>
+                {% endfor %}
+            {% else %}
+                <p>No charts generated.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    <!-- ---------------- REPORT TAB ---------------- -->
+    <div class="tab-content" id="report-tab">
+        <div class="card">
+            <h2 class="glow-text">📊 Full Profiling Report</h2>
+
+            <iframe class="report-frame" src="{{ eda.report_url }}"></iframe>
+        </div>
+    </div>
+
+
+    <!-- ---------------- CHAT TAB ---------------- -->
+    <div class="tab-content" id="chat-tab">
+    <div class="chat-wrapper">
+
+        <div class="chat-header">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" class="chat-ai-icon">
+            <span>AI Assistant</span>
+        </div>
+
+        <div id="chat-box" class="chat-area"></div>
+
+        <form id="qa-form" class="chat-input-area">
+            <textarea id="question" placeholder="Message AI..." class="chat-input"></textarea>
+            <button type="submit" class="send-btn">➤</button>
+        </form>
+
+    </div>
+</div>
+
+
+</div>
+
+
+<!-- ---------------- TAB SWITCH JS ---------------- -->
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+});
+</script>
+<script>
+document.getElementById('qa-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const q = document.getElementById('question').value.trim();
+    if(!q) return;
+    const box = document.getElementById('chat-box');
+
+    // USER MESSAGE
+    box.innerHTML += `
+        <div class="chat-message user">
+            <div class="chat-avatar user"></div>
+            <div class="chat-bubble">${q}</div>
+        </div>
+    `;
+    box.scrollTop = box.scrollHeight;
+    document.getElementById('question').value='';
+
+    // TYPING INDICATOR
+    const typingID = "typing_" + Date.now();
+    box.innerHTML += `
+        <div class="chat-message ai" id="${typingID}">
+            <div class="chat-avatar ai"></div>
+            <div class="chat-bubble"><em>AI is thinking…</em></div>
+        </div>
+    `;
+    box.scrollTop = box.scrollHeight;
+
+    // SEND REQUEST
+    const resp = await fetch("{% url 'core:ask_file' file.pk %}", {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},
+        body: JSON.stringify({question: q})
+    });
+
+    const data = await resp.json();
+    const answer = data.answer || "No answer.";
+
+    // REMOVE TYPING
+    document.getElementById(typingID).remove();
+
+    // AI MESSAGE
+    box.innerHTML += `
+        <div class="chat-message ai">
+            <div class="chat-avatar ai"></div>
+            <div class="chat-bubble">${answer}</div>
+        </div>
+    `;
+    box.scrollTop = box.scrollHeight;
+});
+</script>
+
+
+<!-- ---------------- CHAT SYSTEM ---------------- -->
+<script>
+document.getElementById('qa-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const question = document.getElementById("question").value.trim();
+    if (!question) return;
+
+    const box = document.getElementById("chat-box");
+
+    // Add user bubble
+    box.innerHTML += `<div class="bubble user">${question}</div>`;
+    box.scrollTop = box.scrollHeight;
+    document.getElementById("question").value = "";
+
+    const resp = await fetch("{% url 'core:ask_file' file.pk %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+        body: JSON.stringify({ question })
+    });
+
+    const data = await resp.json();
+    const answer = data.answer || "AI error.";
+
+    // Add AI bubble
+    box.innerHTML += `<div class="bubble ai">${answer}</div>`;
+    box.scrollTop = box.scrollHeight;
+});
+</script>
+
+{% endblock %}

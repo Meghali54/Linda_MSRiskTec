@@ -1,0 +1,73 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}Django Smart Office Assistant{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+<body>
+  <nav class="nav">
+    <a href="{% url 'core:home' %}">Home</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'core:upload' %}">Upload</a>
+      <a href="{% url 'core:logout' %}">Logout ({{ user.username }})</a>
+      {% if user.is_staff %}
+        <a href="{% url 'core:admin_dashboard' %}">Admin Dashboard</a>
+      {% endif %}
+    {% else %}
+      <a href="{% url 'core:login' %}">Login</a>
+      <a href="{% url 'core:register' %}">Register</a>
+    {% endif %}
+  </nav>
+
+  <main class="container">
+    {% if messages %}
+<div class="toast-container">
+    {% for m in messages %}
+        <div class="toast {{ m.tags }}">
+            {{ m }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<style>
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    padding: 16px 22px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    color: white;
+    animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+.toast.success { background: #10b981; }
+.toast.error { background: #ef4444; }
+.toast.warning { background: #f59e0b; }
+
+@keyframes slideIn {
+    from { opacity:0; transform: translateX(40px); }
+    to   { opacity:1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity:1; }
+    to   { opacity:0; transform: translateX(40px); }
+}
+</style>
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

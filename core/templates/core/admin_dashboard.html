@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="card">
+    <h2 class="glow-text">Admin Dashboard</h2>
+
+    <div style="display:flex; gap:20px; margin-top:20px; flex-wrap:wrap;">
+        <div class="card" style="flex:1; min-width:240px; text-align:center;">
+            <h3>Total Users</h3>
+            <p style="font-size:32px; font-weight:700;">{{ total_users }}</p>
+        </div>
+
+        <div class="card" style="flex:1; min-width:240px; text-align:center;">
+            <h3>Total Uploads</h3>
+            <p style="font-size:32px; font-weight:700;">{{ total_uploads }}</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top:30px;">📂 Recent Uploads</h3>
+
+    <table class="eda-table" style="margin-top:10px;">
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>User</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for f in recent %}
+            <tr>
+                <td>{{ f.filename }}</td>
+                <td>{{ f.owner }}</td>
+                <td>{{ f.uploaded_at }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

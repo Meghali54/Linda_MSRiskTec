@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "name": "django-file-ai",
+  "builds": [
+    { "src": "manage.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/media/(.*)", "dest": "/media/$1" },
+    { "src": "/(.*)", "dest": "/manage.py" }
+  ]
+}
