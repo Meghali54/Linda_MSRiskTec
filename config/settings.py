@@ -19,15 +19,26 @@ INSTALLED_APPS = [
     "core",
 ]
 
+# ...existing code...
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # whitenoise.middleware.WhiteNoiseMiddleware will be inserted below if available
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
+
+# Insert WhiteNoise middleware only if the package is installed
+try:
+    import importlib
+    if importlib.util.find_spec("whitenoise") is not None:
+        MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+except Exception:
+    # ignore and continue without WhiteNoise
+    pass
+# ...existing code...
 
 ROOT_URLCONF = "config.urls"
 
