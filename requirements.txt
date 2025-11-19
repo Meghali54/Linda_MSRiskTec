@@ -14,4 +14,4 @@ PyPDF2
 ydata-profiling[notebook]
 pillow
 imagehash
-visions
+visions 89076
